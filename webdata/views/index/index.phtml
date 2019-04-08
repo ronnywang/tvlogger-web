@@ -1,7 +1,16 @@
 <?= $this->partial('common/header.phtml', $this) ?>
 <ol>
     <?php foreach (NewsHour::search(1) as $news_hour) { ?>
-    <li><a href="/index/edit/<?= $news_hour->channel ?>/<?= $news_hour->time ?>"><?= $news_hour->channel ?>: <?= $news_hour->time ?></a></li>
+    <li>
+    <a href="/index/edit/<?= $news_hour->channel ?>/<?= $news_hour->time ?>"><?= $news_hour->channel ?>: <?= $news_hour->time ?></a>
+    <?php foreach (NewsHourAction::search(array('channel' => $news_hour->channel, 'time' => $news_hour->time)) as $news_hour_action) { ?>
+    <ul>
+        <li>
+        <a href="/index/edit/<?= $news_hour->channel ?>/<?= $news_hour->time ?>/<?= $news_hour_action->id ?>"><?= $news_hour_action->id ?></a>
+        </li>
+    </ul>
+    <?php } ?>
+    </li>
     <?php } ?>
 </ol>
 
