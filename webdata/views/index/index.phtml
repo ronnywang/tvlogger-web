@@ -1,0 +1,8 @@
+<?= $this->partial('common/header.phtml', $this) ?>
+<ol>
+    <?php foreach (NewsHour::search(1) as $news_hour) { ?>
+    <li><a href="/index/edit/<?= $news_hour->channel ?>/<?= $news_hour->time ?>"><?= $news_hour->channel ?>: <?= $news_hour->time ?></a></li>
+    <?php } ?>
+</ol>
+
+<?= $this->partial('common/footer.phtml', $this) ?>

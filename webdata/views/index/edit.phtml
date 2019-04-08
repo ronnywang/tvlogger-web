@@ -1,0 +1,55 @@
+<?= $this->partial('common/header.phtml', $this) ?>
+<script><!--
+var sections_data = <?= json_encode(json_decode($this->news_hour->data)->sections) ?>;
+var img_prefix = 'https://tw-tvnews.s3.amazonaws.com/reports/<?= $this->news_hour->channel ?>/<?= $this->news_hour->time ?>/';
+//--></script>
+    <div class="card">
+        <div class="card-header">結果</div>
+        <div class="card-body">
+            <form id="load-config">
+                <textarea><?= !is_null($this->news_hour_action) ? htmlspecialchars(json_encode(json_decode($this->news_hour_action->data)->data)) : '' ?></textarea><button type="submit">載入設定</button>
+            </form>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>開始時間</th>
+                        <th>結束時間</th>
+                        <th>長度</th>
+                        <th>種類</th>
+                        <th>資訊</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <form method="post" id="save-form" action="/index/post/<?= $this->news_hour->channel ?>/<?= $this->news_hour->time ?>">
+                <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
+                <input type="hidden" name="data" value="">
+                <button type="submit">儲存</button>
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">動作區</div>
+        <div class="card-body" id="action-button">
+            <button id="btn-right">新聞開始</button>
+            <button id="btn-like-prev">跟上面一樣</button>
+            <button id="btn-ad">廣告</button>
+            <button id="btn-section-start">開播畫面</button>
+            <button id="btn-section-other">其他</button>
+            <button id="btn-undo">還原上一動</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            候選影像區
+        </div>
+        <div class="card-body" id="video">
+        </div>
+    </div>
+
+    <script src="/static/report.js"></script>
+    <?php if (!is_null($this->news_hour_action)) { ?>
+    <script> load_config = true; </script>
+    <?php } ?>
+<?= $this->partial('common/footer.phtml', $this) ?>
