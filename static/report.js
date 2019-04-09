@@ -36,6 +36,7 @@ $(function(){
             var action = ['split', button_dom.data('origin-start'), button_dom.data('new-start')];
 
             var edit_tr_dom = $(this).parents('tr');
+            edit_tr_dom.data('parent_tr_dom').removeClass('edit-opened');
             edit_tr_dom.remove();
 
             action_logs.push(action);
@@ -76,13 +77,26 @@ $(function(){
                 do_action(action);
                 $('textarea').val(JSON.stringify(action_logs));
             }
+            edit_tr_dom.data('parent_tr_dom').removeClass('edit-opened');
             edit_tr_dom.remove();
         });
 
+        $('tbody#result').on('click', '.cancel', function(e){
+            e.preventDefault();
+            var edit_tr_dom = $(this).parents('tr');
+            edit_tr_dom.data('parent_tr_dom').removeClass('edit-opened');
+            edit_tr_dom.remove();
+        });
         $('tbody#result').on('click', 'tr.section', function(e){
             e.preventDefault();
             var tr_dom = $(this);
-            var edit_tr_dom = $('<tr></tr>');
+            if (tr_dom.is('.edit-opened')) {
+                return;
+            }
+            tr_dom.addClass('edit-opened');
+
+            var edit_tr_dom = $('<tr></tr>').addClass('edit-tr');
+            edit_tr_dom.data('parent_tr_dom', tr_dom);
             var data = tr_dom.data('members');
             var td_dom = $('<td></td>').attr('colspan', 5);
 
@@ -90,7 +104,9 @@ $(function(){
             var form_dom = $('<form class="group-form dropdown">'
                     + '標題:<input type="text" name="title" size="80" class="dropdown-toggle" data-toggle="dropdown" id="' + id + '">'
                     + '<div class="dropdown-menu" aria-labelledby="' + id + '"></div>'
-                    + '<button type="submit">修改</button></form>'
+                    + '<button type="submit">修改</button>'
+                    + '<button type="button" class="cancel">取消</button>'
+                    + '</form>'
                     );
             $('input[name="title"]', form_dom).val(tr_dom.data('title'));
 
