@@ -11,8 +11,8 @@ $(function(){
             $('.group:visible:not(.done):lt(4)').each(function(){
                 $('.lazyload', this).each(function(){
                     var lazyload_dom = $(this);
-                    lazyload_dom.html($('<img>').attr('src', img_prefix + lazyload_dom.data('img')));
-                    lazyload_dom.append($('<img>').attr('src', img_prefix + lazyload_dom.data('crop')));
+                    lazyload_dom.append($('<td></td>').append($('<img>').attr('src', img_prefix + lazyload_dom.data('img'))));
+                    lazyload_dom.append($('<td></td>').append($('<img>').attr('src', img_prefix + lazyload_dom.data('crop'))));
                     lazyload_dom.removeClass('lazyload');
                 });
             });
@@ -22,7 +22,7 @@ $(function(){
             $('#save-form input[name="data"]').val(JSON.stringify(action_logs));
         });
 
-        $('tbody').on('click', '.youtube-video', function(e){
+        $('tbody#result').on('click', '.youtube-video', function(e){
             e.preventDefault();
 
             var edit_tr_dom = $(this).parents('tr');
@@ -79,7 +79,7 @@ $(function(){
             edit_tr_dom.remove();
         });
 
-        $('tbody').on('click', 'tr.section', function(e){
+        $('tbody#result').on('click', 'tr.section', function(e){
             e.preventDefault();
             var tr_dom = $(this);
             var edit_tr_dom = $('<tr></tr>');
@@ -156,17 +156,20 @@ $(function(){
                     div_dom.data('youtube-id', record['youtube-id']);
                     div_dom.data('youtube-title', record['youtube-title']);
 
-                    div_dom.append($('<h1></h1>').text(get_time_string(record.start) + ' - ' + get_time_string(record.end)));
+                    var table_dom = $('<table></table>').addClass('table').addClass('table-bordered');
+                    table_dom.append($('<tr></tr>').append($('<td></td>').attr('colspan', 2).append(
+                                    $('<h1></h1>').text(get_time_string(record.start) + ' - ' + get_time_string(record.end))))
+                            );
                     if (record['youtube-id']) {
-                        div_dom.append($('<h2></h2>').text(record['youtube-date'] + '. ' + record['youtube-title'] + '(' + record['youtube-id'] + ')'));
+                        table_dom.append($('<tr></tr>').append($('<td></td>').attr('colspan', 2).append(
+                                        $('<h2></h2>').text(record['youtube-date'] + '. ' + record['youtube-title'] + '(' + record['youtube-id'] + ')')
+                                        )));
                     }
 
-                    if (!i) {
-                        div_dom.append($('<div></div>').append($('<img>').attr('src', img_prefix + record['img-file'])).append($('<img>').attr('src', img_prefix + record['crop-file'])));
-                    } else {
-                        div_dom.append($('<div></div>').addClass('lazyload').data('img', record['img-file']).data('crop', record['crop-file']));
-                    }
+                    table_dom.append($('<tr></tr>').append($('<td></td>').text('畫面區')).append($('<td></td>').text('主標題區')));
+                    table_dom.append($('<tr></tr>').addClass('lazyload').data('img', record['img-file']).data('crop', record['crop-file']));
 
+                    div_dom.append(table_dom);
                     $('#video').append(div_dom);
                 }
                 loadmore();
@@ -201,9 +204,9 @@ $(function(){
                 tr_dom.append($('<td></td>').text(end - start + 1));
                 tr_dom.append($('<td></td>').text('新聞段落'));
                 tr_dom.append($('<td></td>').text(youtube_title + '(' + youtube_id + ')'));
-                $('tbody').append(tr_dom);
+                $('tbody#result').append(tr_dom);
             } else if (action == 'btn-like-prev') {
-                var last_tr_dom = $('tbody tr:last');
+                var last_tr_dom = $('tbody#result tr:last');
                 var members = last_tr_dom.data('members');
                 members.push(start);
                 last_tr_dom.data('members', members);
@@ -231,7 +234,7 @@ $(function(){
                 tr_dom.append($('<td></td>').text(end - start + 1));
                 tr_dom.append($('<td></td>').text('廣告'));
                 tr_dom.append($('<td></td>').text(''));
-                $('tbody').append(tr_dom);
+                $('tbody#result').append(tr_dom);
             } else if (action == 'btn-section-other') {
                 var tr_dom = $('<tr></tr>').addClass('section');
                 tr_dom.attr('id', 'group-' + start);
@@ -245,7 +248,7 @@ $(function(){
                 tr_dom.append($('<td></td>').text(end - start + 1));
                 tr_dom.append($('<td></td>').text('其他'));
                 tr_dom.append($('<td></td>').text(''));
-                $('tbody').append(tr_dom);
+                $('tbody#result').append(tr_dom);
             } else if (action == 'btn-section-start') {
                 var tr_dom = $('<tr></tr>').addClass('section');
                 tr_dom.attr('id', 'group-' + start);
@@ -259,11 +262,11 @@ $(function(){
                 tr_dom.append($('<td></td>').text(end - start + 1));
                 tr_dom.append($('<td></td>').text('開播畫面'));
                 tr_dom.append($('<td></td>').text(''));
-                $('tbody').append(tr_dom);
+                $('tbody#result').append(tr_dom);
             } else if (action == 'split') {
                 var origin_start = action_params[0];
                 var new_start = action_params[1];
-                var old_tr_dom = $('tbody #group-' + origin_start);
+                var old_tr_dom = $('tbody#result #group-' + origin_start);
                 var members = old_tr_dom.data('members');
                 var start = origin_start;
                 var end = old_tr_dom.data('end');
@@ -288,7 +291,7 @@ $(function(){
             } else if (action == 'set-title') {
                 var start = action_params[0];
                 var title = action_params[1];
-                var tr_dom = $('tbody #group-' + start);
+                var tr_dom = $('tbody#result #group-' + start);
                 $('td', tr_dom).eq(4).text(title);
                 tr_dom.data('title', title);
                 return;
@@ -302,7 +305,7 @@ $(function(){
 
 
         var replay_actions = function(action_logs){
-            $('tbody').html('');
+            $('tbody#result').html('');
             $('.group').removeClass('done').show();
             action_logs.map(do_action);
         };
