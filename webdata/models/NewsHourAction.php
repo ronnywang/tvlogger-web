@@ -114,6 +114,7 @@ class NewsHourAction extends Pix_Table
             }
         }
 
+        $sections = array_values($sections);
         $result->sections = $sections;
         $result->pending = $processing_sections;
 
@@ -126,7 +127,7 @@ class NewsHourAction extends Pix_Table
 
         // rule1: 如果超過 10% 沒處理就 -10，超過 30% 沒處理 -30，超過 50 % 沒處理 -50
         if ($processing_sections) {
-            $start = $processing_sections[0]->start;
+            $start = $processing_sections[0]->start - 1;
             $end = $processing_sections[count($processing_sections) - 1]->end;
             if ($start / $end < 0.1) {
                 $score -= 90;
@@ -137,16 +138,24 @@ class NewsHourAction extends Pix_Table
             }
 
             if ($start / $end < 0.1) {
-                $warnings[] = array(null, sprintf("有 %f%% 片段未處理(start=%d, end=%d)", 100 * (1 - $start / $end), $start, $end));
+                $warnings[] = array(null, sprintf("有 %d%% 片段未處理(start=%d, end=%d)", 100 * (1 - $start / $end), $start, $end));
             }
         }
 
         // rule2: 如果新聞區沒有加標題的話，一則 -2 分，最多 -20 
         $no_title = 0;
-        foreach ($sections as $section) {
-            if ($section->type == '新聞' and (($section->title == '') or ($section->title == '()'))) {
+        foreach ($sections as $idx => $section) {
+            if ($section->type !== '新聞') {
+                continue;
+            }
+
+            if ($idx == 0 or $idx == count($sections) - 1) {
+                continue;
+            }
+
+            if ((($section->title == '') or ($section->title == '()'))) {
                 $no_title ++;
-                $warnings[] = array($section->start, '未輸入新聞標題');
+                $warnings[] = array($section->start, '未輸入新聞標題', $idx);
             }
         }
         $score -= min(20, 2 * $no_title);
