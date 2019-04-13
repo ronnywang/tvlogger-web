@@ -4,7 +4,7 @@ class NewsHourActionRow extends Pix_Table_Row
 {
     public function getData()
     {
-        $data = json_decode($this->news_hour->data);
+        $data = $this->news_hour->getData();
         $processing_sections = $data->sections;
         $actions = json_decode($this->data)->data;
 
@@ -34,6 +34,9 @@ class NewsHourAction extends Pix_Table
         $result->sections = array();
         $result->pending = array();
         $result->warnings = array();
+        if (!$processing_sections[count($processing_sections) - 1]->end) {
+            array_shift($processing_sections[count($processing_sections) - 1]);
+        }
         
         $sections = array();
 
@@ -53,7 +56,7 @@ class NewsHourAction extends Pix_Table
                 $action_params = array_slice($action, 1);
                 $action = $action[0];
             }
-            $processing_section = array_shift($processing_sections);
+            $processing_section = $processing_sections[0];
             $start = intval($processing_section->start);
             $end = intval($processing_section->end);
             $youtube_id = $processing_section->{'youtube-id'};
@@ -69,6 +72,7 @@ class NewsHourAction extends Pix_Table
                 $section->type = $button_map[$action][0];
                 $section->title = "{$youtube_title}({$youtube_id})";
                 $sections[$start] = $section;
+                array_shift($processing_sections);
             } elseif ($action == 'btn-like-prev') {
                 $last_start = $last_section_id();
                 $sections[$last_start]->members[] = $start;
@@ -78,6 +82,7 @@ class NewsHourAction extends Pix_Table
                     $sections[$last_start]->youtube_title  = $youtube_title;
                     $sections[$last_start]->title = "{$youtube_title}({$youtube_id})";
                 }
+                array_shift($processing_sections);
             } elseif ($action == 'split') {
                 $origin_start = $action_params[0];
                 $new_start = $action_params[1];
@@ -104,7 +109,6 @@ class NewsHourAction extends Pix_Table
                 } else {
                     $sections[$start]->title = $title;
                 }
-                array_unshift($processing_sections, $processing_section);
             } else {
                 throw new Exception("沒有實作這動作 {$action}");
             }
@@ -124,16 +128,16 @@ class NewsHourAction extends Pix_Table
         if ($processing_sections) {
             $start = $processing_sections[0]->start;
             $end = $processing_sections[count($processing_sections) - 1]->end;
-            if ($start / $end > 0.5) {
+            if ($start / $end < 0.1) {
+                $score -= 90;
+            } elseif ($start / $end < 0.5) {
                 $score -= 50;
-            } elseif ($start / $end > 0.3) {
+            } elseif ($start / $end < 0.7) {
                 $score -= 30;
-            } elseif ($start / $end > 0.1) {
-                $score -= 10;
             }
 
-            if ($start / $end > 0.1) {
-                $warnings[] = array(null, sprintf("有 %d%% 片段未處理", 100 * $start / $end));
+            if ($start / $end < 0.1) {
+                $warnings[] = array(null, sprintf("有 %f%% 片段未處理(start=%d, end=%d)", 100 * (1 - $start / $end), $start, $end));
             }
         }
 
