@@ -25,6 +25,9 @@ var img_prefix = 'https://tw-tvnews.s3.amazonaws.com/reports/<?= $this->news_hou
             <form method="post" id="save-form" action="/index/post/<?= $this->news_hour->channel ?>/<?= $this->news_hour->time ?>">
                 <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
                 <input type="hidden" name="data" value="">
+                <?php if ($this->news_hour_action) { ?>
+                <input type="hidden" name="from-action" value="<?= $this->news_hour_action->id ?>">
+                <?php } ?>
                 <button type="submit">儲存</button>
             </form>
         </div>

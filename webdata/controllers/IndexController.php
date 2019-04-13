@@ -46,6 +46,9 @@ class IndexController extends Pix_Controller
         $data->meta = new StdClass;
         $data->meta->created_at = time();
         $data->meta->created_from = $_SERVER['REMOTE_ADDR'];
+        $data->meta->from = $_POST['from-action'];
+        $data->result = NewsHourAction::actionToResult($data->data, $news_hour->getData()->sections);
+        $data->result_data_time = $news_hour->getData()->time;
 
         NewsHourAction::insert(array(
             'id' => $id,
