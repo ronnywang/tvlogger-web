@@ -23,5 +23,7 @@ class NewsHour extends Pix_Table
         $this->_columns['channel'] = array('type' => 'varchar', 'size' => 8);
         $this->_columns['time'] = array('type' => 'int');
         $this->_columns['data'] = array('type' => 'json');
+
+        $this->_relations['actions'] = array('rel' => 'has_many', 'type' => 'NewsHourAction', 'foreign_key' => array('channel', 'time'));
     }
 }
