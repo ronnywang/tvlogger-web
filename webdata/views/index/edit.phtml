@@ -22,7 +22,7 @@ var img_prefix = 'https://tw-tvnews.s3.amazonaws.com/reports/<?= $this->news_hou
                 <tbody id="result">
                 </tbody>
             </table>
-            <form method="post" id="save-form" action="/index/post/<?= $this->news_hour->channel ?>/<?= $this->news_hour->time ?>">
+            <form method="post" id="save-form" action="/index/post/<?= $this->news_hour->channel ?>/<?= $this->news_hour->time ?>" data-check="/index/check/<?= $this->news_hour->channel ?>/<?= $this->news_hour->time ?>">
                 <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
                 <input type="hidden" name="data" value="">
                 <?php if ($this->news_hour_action) { ?>
