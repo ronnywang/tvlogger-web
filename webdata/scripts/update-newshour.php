@@ -19,6 +19,7 @@ foreach ($channels as $channel) {
 
         $data = new StdClass;
         $data->sections = $obj;
+        $data->time = time();
         NewsHour::insert(array(
             'channel' => $channel,
             'time' => $time,
