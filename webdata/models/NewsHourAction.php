@@ -78,7 +78,6 @@ class NewsHourAction extends Pix_Table
                     $sections[$last_start]->youtube_title  = $youtube_title;
                     $sections[$last_start]->title = "{$youtube_title}({$youtube_id})";
                 }
-                error_log($last_start);
             } elseif ($action == 'split') {
                 $origin_start = $action_params[0];
                 $new_start = $action_params[1];
