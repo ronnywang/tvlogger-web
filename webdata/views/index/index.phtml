@@ -4,9 +4,11 @@
     <li>
     <a href="/index/edit/<?= $news_hour->channel ?>/<?= $news_hour->time ?>"><?= $news_hour->channel ?>: <?= $news_hour->time ?></a>
     <?php foreach (NewsHourAction::search(array('channel' => $news_hour->channel, 'time' => $news_hour->time)) as $news_hour_action) { ?>
+    <?php $data = $news_hour_action->getData() ?>
     <ul>
         <li>
         <a href="/index/edit/<?= $news_hour->channel ?>/<?= $news_hour->time ?>/<?= $news_hour_action->id ?>"><?= $news_hour_action->id ?></a>
+        <span title="<?= htmlspecialchars(json_encode($data->warnings, JSON_UNESCAPED_UNICODE)) ?>">(完成度: <?= $data->score ?>)</span>
         </li>
     </ul>
     <?php } ?>
