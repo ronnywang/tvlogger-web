@@ -63,6 +63,29 @@ class IndexController extends Pix_Controller
         }
     }
 
+    public function checkAction()
+    {
+        $terms = explode('/', $this->getURI());
+        list(, /*index*/, /*check*/, $channel, $time) = $terms;
+
+        if (!$news_hour = NewsHour::find(array(strval($channel), intval($time)))) {
+            return $this->redirect('/');
+        }
+
+        if (array_key_exists('from-action', $_POST) and $_POST['from-action']) {
+            $from_action = $news_hour->actions->search(array('id' => $_POST['from-action']))->first();
+        }
+        $data = json_decode($_POST['data']);
+        $result = NewsHourAction::actionToResult($data, $news_hour->getData()->sections);
+        if ($from_action) {
+            if (json_encode(json_decode($from_action->data)->data) == json_encode($data)) {
+                $result->score -= 50;
+                $result->warnings[] = array(null, '您並未做任何修改');
+            }
+        }
+        return $this->json($result);
+    }
+
     public function postAction()
     {
         list(, /*index*/, /*edit*/, $channel, $time) = explode('/', $this->getURI());
