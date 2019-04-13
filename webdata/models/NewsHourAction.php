@@ -142,8 +142,14 @@ class NewsHourAction extends Pix_Table
                 $score -= 30;
             }
 
-            if ($start / $end < 0.1) {
-                $warnings[] = array(null, sprintf("有 %d%% 片段未處理(start=%d, end=%d)", 100 * (1 - $start / $end), $start, $end));
+            if ($start / $end < 0.7) {
+                $duration = $end - $start + 1;
+                if ($duration > 60) {
+                    $time = sprintf("%02d 分 %02d 秒", $duration / 60, $duration % 60);
+                } else {
+                    $time = sprintf("%02d 秒", $duration);
+                }
+                $warnings[] = array(null, sprintf("從 %02d:%02d 開始 還有 %s 片段未處理", $start / 60, $start % 60, $time));
             }
         }
 
@@ -160,7 +166,7 @@ class NewsHourAction extends Pix_Table
 
             if ((($section->title == '') or ($section->title == '()'))) {
                 $no_title ++;
-                $warnings[] = array($section->start, '未輸入新聞標題', $idx);
+                $warnings[] = array($section->start, sprintf('%02d:%02d 沒有新聞標題', $section->start / 60, $section->start % 60), $idx);
             }
         }
         $score -= min(20, 2 * $no_title);
