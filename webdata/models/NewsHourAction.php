@@ -4,10 +4,15 @@ class NewsHourActionRow extends Pix_Table_Row
 {
     public function getData()
     {
-        $data = $this->news_hour->getData();
-        $processing_sections = $data->sections;
-        $actions = json_decode($this->data)->data;
 
+        $data = json_decode($this->data);
+        if (property_exists($data, 'result')) {
+            return $data->result;
+        }
+
+        $sections_data = $this->news_hour->getData();
+        $processing_sections = $sections_data->sections;
+        $actions = json_decode($this->data)->data;
         return NewsHourAction::actionToResult($actions, $processing_sections);
     }
 }
