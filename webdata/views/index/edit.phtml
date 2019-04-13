@@ -1,6 +1,6 @@
 <?= $this->partial('common/header.phtml', $this) ?>
 <script><!--
-var sections_data = <?= json_encode(json_decode($this->news_hour->data)->sections) ?>;
+var sections_data = <?= json_encode($this->news_hour->getData()->sections, JSON_UNESCAPED_UNICODE) ?>;
 var img_prefix = 'https://tw-tvnews.s3.amazonaws.com/reports/<?= $this->news_hour->channel ?>/<?= $this->news_hour->time ?>/';
 //--></script>
     <div class="card">
