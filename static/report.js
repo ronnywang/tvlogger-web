@@ -20,6 +20,33 @@ $(function(){
 
         $('#save-form').submit(function(e){
             $('#save-form input[name="data"]').val(JSON.stringify(action_logs));
+
+            if ($(this).is('.checked')) {
+                return;
+            }
+
+            e.preventDefault();
+            $.post($(this).data('check'), $(this).serialize(), function(ret){
+                    var confirmed = false;
+                    if (ret.score < 60) {
+                        alert("完成度過低，無法儲存，原因如下：\n" +
+                                ret.warnings.map(function(w, idx) { return (idx+1) + '.' + w[1]; }).join("\n"));
+                        return;
+                    } else if (ret.score < 100) {
+                        var message = "您有部份未完成，您確定要儲存嗎？未完成原因如下：\n";
+                        message += ret.warnings.map(function(w, idx) { return (idx+1) + '.' + w[1]; }).join("\n");
+                        if (confirm(JSON.stringify(message))) {
+                            confirmed = true;
+                        }
+                    } else {
+                        confirmed = true;
+                    }
+
+                    if (confirmed) {
+                        $('#save-form').addClass('checked');
+                        $('#save-form').submit();
+                    }
+            }, 'json');
         });
 
         $('tbody#result').on('click', '.youtube-video', function(e){
