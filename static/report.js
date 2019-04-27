@@ -339,7 +339,7 @@ $(function(){
                 tr_dom.data('title', title);
                 return;
             } else {
-                alert('還沒實作這動作');
+                alert('還沒實作這動作: ' + action);
                 return;
             }
 
