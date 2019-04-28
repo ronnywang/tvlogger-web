@@ -2,6 +2,17 @@
 
 class ApiController extends Pix_Controller
 {
+    public function sectionAction()
+    {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET');
+
+        list(, /*index*/, /*section*/, $channel, $time) = explode('/', $this->getURI());
+
+        $news_hour = NewsHour::find(array($channel, $time));
+        return $this->json(json_decode($news_hour->data));
+    }
+
     public function listAction()
     {
         header('Access-Control-Allow-Origin: *');
@@ -14,6 +25,7 @@ class ApiController extends Pix_Controller
             $news_hour = new StdClass;
             $news_hour->channel = $row[0];
             $news_hour->time = intval($row[1]);
+            $news_hour->section_api = "/api/section/{$row[0]}/{$row[1]}";
             $news_hour->result = array();
             $news_hours[$rows[0] . $rows[1]] = $news_hour;
         }
