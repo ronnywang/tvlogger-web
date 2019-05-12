@@ -53,7 +53,7 @@ class NewsHourAction extends Pix_Table
         $button_map = array(
             'btn-right' => array('新聞', 'news'),
             'btn-ad' => array('廣告', 'ad'),
-            'btn-other' => array('其他', 'other'),
+            'btn-section-other' => array('其他', 'other'),
             'btn-section-start' => array('轉場', 'start'),
         );
         foreach ($actions as $action) {
