@@ -27,7 +27,7 @@ class ApiController extends Pix_Controller
             $news_hour->time = intval($row[1]);
             $news_hour->section_api = "/api/section/{$row[0]}/{$row[1]}";
             $news_hour->result = array();
-            $news_hours[$rows[0] . $rows[1]] = $news_hour;
+            $news_hours[$row[0] . $row[1]] = $news_hour;
         }
 
         $sql = "SELECT channel, time, id, data->'$.result_data_time', data->'$.result.score' FROM news_hour_action";
