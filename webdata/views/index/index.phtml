@@ -1,16 +1,26 @@
+<?php
+
+$news_hour_actions = array();
+foreach (NewsHourAction::search(1) as $news_hour_action) {
+    $news_hour_actions[$news_hour_action->channel . ':' . $news_hour_action->time][] = $news_hour_action;
+}
+
+?>
 <?= $this->partial('common/header.phtml', $this) ?>
 <ol>
-    <?php foreach (NewsHour::search(1) as $news_hour) { ?>
+    <?php foreach (NewsHour::search(1)->toArray(array('channel', 'time')) as $news_hour) { ?>
     <li>
-    <a href="/index/edit/<?= $news_hour->channel ?>/<?= $news_hour->time ?>"><?= $news_hour->channel ?>: <?= $news_hour->time ?></a>
-    <?php foreach (NewsHourAction::search(array('channel' => $news_hour->channel, 'time' => $news_hour->time)) as $news_hour_action) { ?>
+    <a href="/index/edit/<?= $news_hour['channel'] ?>/<?= $news_hour['time'] ?>"><?= $news_hour['channel'] ?>: <?= $news_hour['time'] ?></a>
+    <?php if (array_key_exists($news_hour['channel'] . ':' . $news_hour['time'], $news_hour_actions)) { ?>
+    <?php foreach ($news_hour_actions[$news_hour['channel'] . ':' . $news_hour['time']] as $news_hour_action) { ?>
     <?php $data = $news_hour_action->getData() ?>
     <ul>
         <li>
-        <a href="/index/edit/<?= $news_hour->channel ?>/<?= $news_hour->time ?>/<?= $news_hour_action->id ?>"><?= $news_hour_action->id ?></a>
+        <a href="/index/edit/<?= $news_hour['channel'] ?>/<?= $news_hour['time'] ?>/<?= $news_hour_action->id ?>"><?= $news_hour_action->id ?></a>
         <span title="<?= htmlspecialchars(json_encode($data->warnings, JSON_UNESCAPED_UNICODE)) ?>">(完成度: <?= $data->score ?>)</span>
         </li>
     </ul>
+    <?php } ?>
     <?php } ?>
     </li>
     <?php } ?>
