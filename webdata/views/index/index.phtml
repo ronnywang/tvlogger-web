@@ -7,6 +7,7 @@ foreach (NewsHourAction::search(1) as $news_hour_action) {
 
 ?>
 <?= $this->partial('common/header.phtml', $this) ?>
+<code>List API: /api/list</code>
 <ol>
     <?php foreach (NewsHour::search(1)->toArray(array('channel', 'time')) as $news_hour) { ?>
     <li>
@@ -17,7 +18,7 @@ foreach (NewsHourAction::search(1) as $news_hour_action) {
     <ul>
         <li>
         <a href="/index/edit/<?= $news_hour['channel'] ?>/<?= $news_hour['time'] ?>/<?= $news_hour_action->id ?>"><?= $news_hour_action->id ?></a>
-        <span title="<?= htmlspecialchars(json_encode($data->warnings, JSON_UNESCAPED_UNICODE)) ?>">(完成度: <?= $data->score ?>)</span>
+        <span title="<?= htmlspecialchars(json_encode($data->warnings, JSON_UNESCAPED_UNICODE)) ?>">(完成度: <?= $data->score ?>) <a href="/index/result/<?= $news_hour['channel'] ?>/<?= $news_hour['time'] ?>/<?= $news_hour_action->id ?>?format=csv">CSV</a></span>
         </li>
     </ul>
     <?php } ?>
