@@ -1,4 +1,12 @@
 var videos = {};
+var key_binding = {
+    n : "btn-right",
+    s : "btn-like-prev",
+    a : "btn-ad",
+    i : "btn-section-start",
+    o : "btn-section-other",
+    c : "btn-undo"
+};
 
 var get_time_string = function(n){
     return ('00' + Math.floor(n / 60)).substr(-2) + ':' 
@@ -377,5 +385,11 @@ $(function(){
         if (load_config) {
             $('#load-config').submit();
         }
-});
 
+        $(document).keyup(function(e){
+            letter = e.key;
+            if (Object.keys(key_binding).indexOf(letter) > -1) {
+                $("button#"+key_binding[letter]).trigger("click");                  
+            }
+        });
+});
