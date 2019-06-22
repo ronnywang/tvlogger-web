@@ -382,7 +382,7 @@ $(function(){
             replay_actions(action_logs);
             loadmore();
         });
-        if (load_config) {
+        if (typeof(load_config) !== 'undefined') {
             $('#load-config').submit();
         }
 
