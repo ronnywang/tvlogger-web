@@ -388,7 +388,9 @@ $(function(){
 
         $(document).keyup(function(e){
             letter = e.key;
-            if (Object.keys(key_binding).indexOf(letter) > -1) {
+            isActionKey = Object.keys(key_binding).indexOf(letter) > -1;
+            isFocus = $("input,textarea").is(":focus");
+            if (isActionKey && !isFocus) {
                 $("button#"+key_binding[letter]).trigger("click");                  
             }
         });
