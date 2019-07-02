@@ -7,7 +7,10 @@ class NewsHourActionRow extends Pix_Table_Row
 
         $data = json_decode($this->data);
         if (property_exists($data, 'result')) {
-            return $data->result;
+            foreach ($data->result as $k => $v) {
+                $data->meta->{$k} = $v;
+            }
+            return $data->meta;
         }
 
         $sections_data = $this->news_hour->getData();
