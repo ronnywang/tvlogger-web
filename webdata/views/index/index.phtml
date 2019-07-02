@@ -1,30 +1,118 @@
 <?php
 
-$news_hour_actions = array();
+$news_hour_actions = new StdClass;
+$month_hour = new StdClass;
+$channels = array();
+foreach (NewsHour::search(1)->toArray(array('channel', 'time')) as $news_hour) {
+    $channel = $news_hour['channel'];
+    $time = $news_hour['time'];
+    $yyyymm = substr($time, 0, 6);
+    if (!property_exists($month_hour, $yyyymm)) {
+        $month_hour->{$yyyymm} = new StdClass;
+    }
+    if (!property_exists($month_hour->{$yyyymm}, $channel)) {
+        $month_hour->{$yyyymm}->{$channel} = new StdClass;
+    }
+    $month_hour->{$yyyymm}->{$channel}->{$time} = true;
+    $channels[$channel] = true;
+    if (!property_exists($news_hour_actions, $channel . ':' . $time)) {
+        $news_hour_actions->{$channel . ':' . $time} = array();
+    }
+}
+
 foreach (NewsHourAction::search(1) as $news_hour_action) {
-    $news_hour_actions[$news_hour_action->channel . ':' . $news_hour_action->time][] = $news_hour_action;
+    if (!property_exists($news_hour_actions, $news_hour_action->channel . ':' . $news_hour_action->time)) {
+        $news_hour_actions->{$news_hour_action->channel . ':' . $news_hour_action->time} = array();
+    }
+    $news_hour_actions->{$news_hour_action->channel . ':' . $news_hour_action->time}[] = $news_hour_action;
 }
 
 ?>
 <?= $this->partial('common/header.phtml', $this) ?>
 <code>List API: /api/list</code>
-<ol>
-    <?php foreach (NewsHour::search(1)->toArray(array('channel', 'time')) as $news_hour) { ?>
-    <li>
-    <a href="/index/edit/<?= $news_hour['channel'] ?>/<?= $news_hour['time'] ?>"><?= $news_hour['channel'] ?>: <?= $news_hour['time'] ?></a>
-    <?php if (array_key_exists($news_hour['channel'] . ':' . $news_hour['time'], $news_hour_actions)) { ?>
-    <?php foreach ($news_hour_actions[$news_hour['channel'] . ':' . $news_hour['time']] as $news_hour_action) { ?>
-    <?php $data = $news_hour_action->getData() ?>
-    <ul>
-        <li>
-        <a href="/index/edit/<?= $news_hour['channel'] ?>/<?= $news_hour['time'] ?>/<?= $news_hour_action->id ?>"><?= $news_hour_action->id ?></a>
-        <span title="<?= htmlspecialchars(json_encode($data->warnings, JSON_UNESCAPED_UNICODE)) ?>">(完成度: <?= $data->score ?>) <a href="/index/result/<?= $news_hour['channel'] ?>/<?= $news_hour['time'] ?>/<?= $news_hour_action->id ?>?format=csv">CSV</a></span>
-        </li>
-    </ul>
-    <?php } ?>
-    <?php } ?>
-    </li>
-    <?php } ?>
-</ol>
+<div style="clear:both"></div>
+<style>
+.date-empty {
+    opacity: 0.1;
+}
+.date-green {
+    background-color: #aaffaa;
+}
+.date-yellow{
+    background-color: #aaffff;
+}
+</style>
+
+<?php foreach ($month_hour as $yyyymm => $channel_news_hours) { ?>
+<?php sscanf($yyyymm, "%04d%02d", $year, $month); ?>
+<h1><?= $year ?> / <?= $month ?></h1>
+<?php foreach ($channel_news_hours as $channel => $news_hours) { ?>
+<div style="float: left">
+    <h2><?= $channel ?></h2>
+    <table border="1">
+        <tr>
+            <td>日</td>
+            <td>一</td>
+            <td>二</td>
+            <td>三</td>
+            <td>四</td>
+            <td>五</td>
+            <td>六</td>
+        </tr>
+        <?php $month_start = mktime(0, 0, 0, $month, 1, $year) - 86400 * date('w', mktime(0, 0, 0, $month, 1, $year)); ?>
+        <?php while(true) { ?>
+        <tr>
+            <?php for ($i = 0; $i < 7; $i ++ ) { ?>
+            <?php $day = date('j', $month_start + $i * 86400) ?>
+            <?php if (date('n', $month_start + $i * 86400) != $month) { ?>
+            <td></td>
+            <?php } else { ?>
+            <?php $ymd = date('Ymd', mktime(0, 0, 0, $month, $day, $year)) ?>
+            <td>
+                <h3><?= $day ?></h3>
+                <?php foreach (array(11,12,17,18,19) as $hour) { ?>
+                <?php $time = sprintf("%06d%02d%02d", $yyyymm, $day, $hour) ?>
+                <?php if (!property_exists($news_hours, $time)) { ?>
+                    <div class="dropdown date-empty">
+                        <button class="btn dropdown-toggle" disabled="disabled"><?= $hour ?></button>
+                    </div>
+                        <?php } else { ?>
+                        <?php $score = 0; ?>
+                        <?php foreach ($news_hour_actions->{"{$channel}:{$time}"} as $action) { ?>
+                        <?php $score = max($action->getData()->score, $score) ?>
+                        <?php } ?>
+                        <?php
+                            if ($score > 90) { $class = "date-green"; }
+                            elseif ($score > 30) { $class = "date-yellow"; }
+                            else {$class = ''; }
+                        ?>
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle <?= $class ?>" type="button" id="dropdown-<?= "{$channel}-{$time}" ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?= $hour ?></button>
+                            <div class="dropdown-menu" aria-labelledby="dropdown-<?= "{$channel}-{$time}" ?>">
+                                <a class="dropdown-item" href="/index/result/<?= $channel ?>/<?= $time ?>"><?= $hour ?></a>
+                                <?php foreach ($news_hour_actions->{"{$channel}:{$time}"} as $action) { ?>
+                                <a class="dropdown-item" href="/index/result/<?= $channel ?>/<?= $time ?>/<?= $action->id ?>"><?= date('Y/m/d H:i:s', $action->getData()->created_at) ?>(<?= $action->getData()->score ?>)</a>
+                                <?php } ?>
+                            </div>
+                        </div>
+                        <?php } ?>
+                <?php } ?>
+            </td>
+            <?php } ?>
+            <?php } ?>
+        </tr>
+        <?php $month_start += 7 * 86400 ?>
+        <?php if (date('n', $month_start) != $month) break; ?>
+        <?php } ?>
+        <tr>
+        </tr>
+
+    </table>
+    <hr>
+</div>
+<?php } ?>
+<div style="clear:both"></div>
+<?php } ?>
+<div style="clear:both"></div>
 
 <?= $this->partial('common/footer.phtml', $this) ?>
