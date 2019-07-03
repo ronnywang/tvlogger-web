@@ -9,6 +9,7 @@ class IndexController extends Pix_Controller
             Pix_Session::set('sToken', $sToken);
         }
         $this->view->sToken = $sToken;
+        $this->view->user = ($user_id = Pix_Session::get('user_id')) ? User::find($user_id) : null;
     }
 
     public function indexAction()

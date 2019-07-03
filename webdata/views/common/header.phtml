@@ -33,6 +33,18 @@ _gaq.push(['_trackPageview']);
             <li class="nav-item">
             <a class="nav-link" href="https://g0v.hackmd.io/c/HJJH5046V/%2FygAUri2uToGbyvM-Elxu7w" target="_blank">說明文件</a>
             </li>
+            <?php if ($this->user) { ?>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="login-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Hi! <?= $this->escape($this->user->display_name) ?></a>
+                <div class="dropdown-menu" aria-labelledby="login-dropdown">
+                    <a class="dropdown-item" href="/login/logout">登出</a>
+                </div>
+            </li>
+            <?php } else { ?>
+            <li class="nav-item">
+            <a class="nav-link" href="/login/google">Google 登入</a>
+            </li>
+            <?php } ?>
         </ul>
     </div>
 </nav>

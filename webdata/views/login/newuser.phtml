@@ -1,0 +1,9 @@
+<?= $this->partial('common/header.phtml', $this) ?>
+<h1>新增帳號</h1>
+<div>您即將新增帳號，請選擇您想要的顯示名稱</div>
+<form method="post">
+    <input type="hidden" name="sToken" value="<?= $this->sToken ?>">
+    名稱：<input type="text" name="display_name" value="<?= $this->escape($this->display_name) ?>">(16字內)
+    <button type="submit">新增帳號</button>
+</form>
+<?= $this->partial('common/footer.phtml', $this) ?>
