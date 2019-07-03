@@ -101,6 +101,7 @@ class IndexController extends Pix_Controller
         $data->data = json_decode($_POST['data']);
         $data->meta = new StdClass;
         $data->meta->created_at = time();
+        $data->meta->created_by = $this->view->user->user_id;
         $data->meta->created_from = $_SERVER['REMOTE_ADDR'];
         $data->meta->from = $_POST['from-action'];
         $data->result = NewsHourAction::actionToResult($data->data, $news_hour->getData()->sections);
