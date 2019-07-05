@@ -89,9 +89,9 @@ foreach (NewsHourAction::search(1) as $news_hour_action) {
                         <div class="dropdown">
                             <button class="btn dropdown-toggle <?= $class ?>" type="button" id="dropdown-<?= "{$channel}-{$time}" ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?= $hour ?></button>
                             <div class="dropdown-menu" aria-labelledby="dropdown-<?= "{$channel}-{$time}" ?>">
-                                <a class="dropdown-item" href="/index/result/<?= $channel ?>/<?= $time ?>"><?= $hour ?></a>
+                                <a class="dropdown-item" href="/index/edit/<?= $channel ?>/<?= $time ?>"><?= $hour ?></a>
                                 <?php foreach ($news_hour_actions->{"{$channel}:{$time}"} as $action) { ?>
-                                <a class="dropdown-item" href="/index/result/<?= $channel ?>/<?= $time ?>/<?= $action->id ?>"><?= date('Y/m/d H:i:s', $action->getData()->created_at) ?>(<?= $action->getData()->score ?>)</a>
+                                <a class="dropdown-item" href="/index/edit/<?= $channel ?>/<?= $time ?>/<?= $action->id ?>"><?= date('Y/m/d H:i:s', $action->getData()->created_at) ?>(<?= $action->getData()->score ?>)</a>
                                 <?php } ?>
                             </div>
                         </div>
