@@ -35,32 +35,43 @@ class IndexController extends Pix_Controller
     public function resultAction()
     {
         $terms = explode('/', $this->getURI());
-        list(, /*index*/, /*result*/, $channel, $time, $id) = $terms;
+        list(, /*index*/, /*result*/, $channel, $time) = $terms;
 
         if (!$news_hour = NewsHour::find(array(strval($channel), intval($time)))) {
             return $this->redirect('/');
         }
-        if (!$news_hour_action = NewsHourAction::find(array(strval($channel), intval($time), strval($id)))) {
-            return $this->redirect('/');
-        }
-
         if (array_key_exists('format', $_GET) and $_GET['format'] == 'csv') {
             $output = fopen('php://output', 'w');
             header('Content-Type: text/plain');
-            fputcsv($output, array('start', 'end', 'duration', 'type', 'title'));
-            foreach ($news_hour_action->getData()->sections as $section) {
-                fputcsv($output, array(
-                    intval($section->start),
-                    intval($section->end),
-                    intval($section->end - $section->start + 1),
-                    strval($section->type),
-                    strval($section->title),
-                ));
+            fputcsv($output, array('logger_id', 'start', 'end', 'duration', 'type', 'title'));
+        } else {
+            $result = array();
+        }
 
+        foreach (NewsHourAction::search(array('channel' => strval($channel), 'time' => intval($time))) as $action) {
+            if (array_key_exists('format', $_GET) and $_GET['format'] == 'csv') {
+                foreach ($action->getData()->sections as $section) {
+                    fputcsv($output, array(
+                        $action->id,
+                        intval($section->start),
+                        intval($section->end),
+                        intval($section->end - $section->start + 1),
+                        strval($section->type),
+                        strval($section->title),
+                    ));
+
+                }
+                return $this->noview();
+            } else {
+                $result[] = array($action->id, $action->getData());
             }
+        }
+
+        if (array_key_exists('format', $_GET) and $_GET['format'] == 'csv') {
+            fclose($output);
             return $this->noview();
         } else {
-            return $this->json($news_hour_action->getData());
+            return $this->json($result);
         }
     }
 
