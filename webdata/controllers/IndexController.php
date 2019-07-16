@@ -61,7 +61,6 @@ class IndexController extends Pix_Controller
                     ));
 
                 }
-                return $this->noview();
             } else {
                 $result[] = array($action->id, $action->getData());
             }
